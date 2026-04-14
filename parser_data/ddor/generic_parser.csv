@@ -1,0 +1,16 @@
+﻿variable,value,Instructions
+sheet_name,Planned Investments,name of the spreadsheet where DDOR information is
+rows_to_skip,1,rows to skip while reading the spreadsheet. Column names considered at the next excel line
+row_to_stop,21,rows where reading can stop at. Leave cell empty if nothing to specify
+id_col,DDOR ID,Name of the column where DDOR id is.
+def_mw_col,Deficiency Need,Name of the column where DDOR deficiencies are
+project_cost_kdol_col,Total Captial Cost ($000s),Name of the column where DDOR project cost is
+project_type_col,,"Name of the column  with info about project type (feeder, bank substation). Not mandatory, can be empty"
+service_col,Distribution Service,"Name of the column with info about service type (capacity, reliability, voltage, etc). If exists capacity atributes are filtered"
+facility_id_col,Facility ID,Name of the column where the DDOR facility ID exist. Not mandatory. Can be empty.
+capacity_atr,"Thermal, Backtie","How capacity projects are called in the Service columns. If not empty, it is used to filter DDOR only for capacity projects"
+capacity_atr,Thermal,The same as the above. It should be used when there are more than 1 way to name capacity projects
+bank_feeder_atr,,how are bank and feeder called in the project type column. Info only. Not mandatory. Only used if project type not empty
+bank_atr,,how are bank called in the project type column.Info only. Not mandatory. Only used if project type not empty
+bank_fdr_atr,,how are feeder called in the project type column. Info only. Not mandatory. Only used if project type not empty
+line_atr,Line Section,how are line called in the project type column. Info only. Not mandatory. Only used if project type not empty

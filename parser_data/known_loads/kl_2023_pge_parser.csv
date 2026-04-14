@@ -1,0 +1,16 @@
+﻿variable,value
+sheet_name,GNA D - DER Growth
+rows_to_skip,7
+row_to_stop,
+col_to_stop,
+gna_id_col,
+facility_id_col,Facility ID
+facility_name_col,Facility Name
+dec_solar_mw_col,Solar (MW)
+dec_storage_nr_ch_mw_col,Energy Storage NonRes Charge (MW)
+dec_storage_r_ch_mw_col,Energy Storage Res Charge (MW)
+dec_storage_nr_dc_mw_col,Energy Storage NonRes Discharge (MW)
+dec_storage_r_dc_mw_col,Energy Storage Res Discharge (MW)
+dec_ee_mw_col,Energy Efficiency (MW)
+inc_fs_mw_col,Fuel Substitution (MW)
+inc_ev_mw_col,Electric Vehicles (MW)

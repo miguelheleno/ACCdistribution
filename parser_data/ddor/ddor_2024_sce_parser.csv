@@ -1,0 +1,13 @@
+﻿variable,value
+sheet_name,Grid Needs Assessment (GNA)
+rows_to_skip,1
+row_to_stop,
+id_col,GNA ID
+def_mw_col,deficiency
+project_cost_kdol_col,Total Project Cost Estimate
+project_type_col,Bank or Circuit Project
+service_col,Distribution Service Required
+capacity_atr,Capacity
+capacity_atr,Capacity (UCT)
+bank_feeder_atr,Circuit
+bank_atr,Bank

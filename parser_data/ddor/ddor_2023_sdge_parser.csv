@@ -1,0 +1,16 @@
+﻿variable,value
+sheet_name,Planned Investments
+rows_to_skip,1
+row_to_stop,21
+id_col,DDOR ID
+def_mw_col,Deficiency Need
+project_cost_kdol_col,Total Captial Cost ($000s)
+project_type_col,
+service_col,Distribution Service
+facility_id_col,Facility ID
+capacity_atr,"Thermal, Backtie"
+capacity_atr,Thermal
+bank_feeder_atr,
+bank_atr,
+bank_fdr_atr,
+line_atr,Line Section

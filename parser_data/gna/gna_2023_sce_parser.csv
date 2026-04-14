@@ -1,0 +1,11 @@
+﻿variable,value
+sheet_name,Planning Assumptions_Feeder
+rows_to_skip,2
+row_to_stop,
+col_to_stop,
+gna_id_col,GNA ID
+facility_id_col,Facility
+demand_mw_col,"Cumulative
+Demand (MW)"
+rating_mw_col,"Facility
+Loading Limit (MW)"

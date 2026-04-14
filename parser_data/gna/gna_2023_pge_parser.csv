@@ -1,0 +1,13 @@
+﻿variable,value
+sheet_name,GNA E - Bank & Feeder Capacity 
+rows_to_skip,7
+row_to_stop,4237
+col_to_stop,
+gna_id_col,GNA NEED ID
+facility_id_col,Facility ID formatted
+facility_name_col,Facility Name
+demand_mw_col,Facility Loading (MW)
+rating_mw_col,Facility Rating (MW)
+area_col,Distribution Planning Regions
+division_col,Division
+facility_type_col,Facility Type

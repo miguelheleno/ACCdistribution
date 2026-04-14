@@ -1,0 +1,16 @@
+﻿variable,value
+sheet_name,DDOR A.1 - Planned Investments
+rows_to_skip,5
+row_to_stop,
+id_col,DDOR ID
+def_mw_col,"Grid Need
+(2023-2032)"
+project_cost_kdol_col,Project Cost ($k)
+project_type_col,Project Type
+service_col,Distribution Service Required
+facility_id_col,Facility ID
+capacity_atr,Capacity
+bank_feeder_atr,Feeder
+bank_atr,Bank
+bank_fdr_atr,Bank and Feeder
+line_atr,Line Section
