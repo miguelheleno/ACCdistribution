@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 
 
 class GNA:
@@ -23,14 +24,10 @@ class GNA:
         self.year_end = year_end
         self.years = list(range(year_start, year_end+1))
         self.gna_data = pd.DataFrame()
-        self.actual_overloads = pd.DataFrame()
-        self.counterfactual_overloads = pd.DataFrame()
-        self.deferred_overloads = pd.DataFrame()
-        self.der_totals = pd.DataFrame()
+
         self.actual_load = pd.DataFrame()
-        self.net_load = pd.DataFrame()
-        self.inc_load = pd.DataFrame()
-        self.dec_load = pd.DataFrame()
+        self.inc_ders = pd.DataFrame()
+        self.dec_ders = pd.DataFrame()
 
     def add_records(self, xls_file, parsing_csv_file):
         # prepare parsing dictionary
@@ -69,13 +66,14 @@ class GNA:
         counts = {k: 0 for k in facility_cols}
         new_cols = {}
         for c in df.columns:
-            for k in facility_cols:
-                if k in str(c):
+            for k in sorted(facility_cols, key=len, reverse=True):
+                if str(c).startswith(k):
                     i = counts[k]
                     if i < len(self.years):
                         new_cols[c] = f"{col_map[k]}_{self.years[i]}"
                         counts[k] += 1
                     break
+
         # removing the original mw columns from the col map, updating it and slicing df.
         col_map = {k: v for k, v in col_map.items()
                    if k not in facility_cols}
@@ -94,7 +92,7 @@ class GNA:
             x = x.fillna(0)
             self.gna_data = x
 
-    def get_overloads(self):
+    def get_overloads_and_ders (self):
         df = self.gna_data
 
         load_act, load_inc, load_dec, rating = (pd.DataFrame(), pd.DataFrame(),
@@ -107,18 +105,26 @@ class GNA:
             load_act[f'{yr}'] = df[[c for c in y_df if 'demand_mw' in c]].sum(axis=1)
             rating[f'{yr}'] = df[[c for c in y_df if 'rating_mw' in c]].sum(axis=1)
 
+        # if equipment rating is given, adjust rating of each facility given [used for SCE for example]
+        equipment_rating_cols = [c for c in df if 'equipment_rating_mw' in c]
+        if len(equipment_rating_cols) > 0:
+            r = df[[c for c in df if 'equipment_rating_mw' in c]].max(axis=1)
+            r = r.apply(lambda x: 9999.9 if x==0 else x)
+            for c in rating.columns:
+                rating[c] = np.minimum(rating[c].values,r.values)
+
+        # calculate loads in all scenarios
         net = load_act - load_dec - load_inc
         dec = load_act - load_dec
         inc = load_act - load_inc
 
+         # calculate counterfactual and actual deficiencies
         counterfactual = pd.DataFrame()
         counterfactual['net'] = net.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
         counterfactual['dec'] = dec.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
         counterfactual['inc'] = inc.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
-
-        #actual_def = load_act.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
-        actual_def = (load_act - rating).clip(lower=0).max(axis=1)
-        deferred = counterfactual.sub(actual_def, axis=0)
+        actual_def = load_act.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
+        #actual_def = (load_act - rating).clip(lower=0).max(axis=1)
 
         der_red = pd.DataFrame()
         der_red['net'] = (load_dec + load_inc).sum(axis=1)
@@ -126,16 +132,14 @@ class GNA:
         der_red['inc'] = load_inc.sum(axis=1)
 
         self.actual_load = load_act
-        self.net_load = net
-        self.inc_load = inc
-        self.dec_load = dec
+        self.inc_ders = load_inc
+        self.dec_ders = load_dec
 
-        self.actual_overloads =  actual_def
-        self.counterfactual_overloads = counterfactual
-        self.deferred_overloads = deferred
-        self.der_totals = der_red
-
-        return actual_def, counterfactual
+        result = {'actual_overloads': actual_def,
+                  'counterfactual_overloads':counterfactual,
+                  'der_totals':der_red,
+                  }
+        return result
 
 
 data_folder_2023 = os.path.join(

@@ -1,0 +1,16 @@
+﻿variable,value
+sheet_name,Planning Assumptions_Feeder
+rows_to_skip,2
+row_to_stop,
+col_to_stop,CB
+gna_id_col,GNA ID
+facility_id_col,Facility
+facility_name_col,
+dec_solar_r_mw_col,"Residential
+PV (MW)"
+dec_solar_nr_mw_col,"Non-Residential
+PV (MW)"
+dec_storage_nr_dc_mw_col,ES (MW)
+dec_ee_mw_col,EE (MW)
+inc_be_mw_col,BE (MW)
+inc_ev_mw_col,EV (MW)
