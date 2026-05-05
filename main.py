@@ -12,7 +12,6 @@ if __name__ == '__main__':
         'Confidential- E3 Calculations - 2024 ACC Distribution Data20250403112056'
     )
 
-    """
     ########################
     # PGE
     ########################
@@ -37,7 +36,6 @@ if __name__ == '__main__':
 
     acc_calculations(pge_d, pge_g, utility_marginal_cost_factor=0.0832)
 
-    """
 
     ########################
     # SCE
@@ -87,3 +85,30 @@ if __name__ == '__main__':
                      utility_marginal_cost_factor=0.1148,
                      feeder_transfers_ratio=0.2)
 
+
+
+    ########################
+    # SDGE
+    ########################
+
+    # read sdge ddor
+    sdge_ddor_file_2023 = os.path.join(data_folder_2023, 'SDG&E_working draft_to_share.xlsx')
+    sdge_ddor_dict_2023   = 'parser_data/ddor/ddor_2023_sdge_parser.csv'
+    sdge_d = DDOR(utility_name="SDG&E",
+                  year=2023,
+                  file_path=sdge_ddor_file_2023,
+                  parsing_dictionary=sdge_ddor_dict_2023)
+
+    # read sdge gna
+    sdge_gna_file_2023 = os.path.join(data_folder_2023, 'SDG&E_working draft_to_share.xlsx')
+    sdge_gna_dict_2023 = 'parser_data/gna/gna_2023_sdge_parser.csv'
+    sdge_kl_dict_2023 = 'parser_data/known_loads/kl_2023_sdge_parser.csv'
+    sdge_g = GNA(utility_name="SDG&E",
+                   year_start=2023, year_end=2027)
+    sdge_g.add_records(xls_file=sdge_gna_file_2023,
+                         parsing_csv_file=sdge_gna_dict_2023)
+    sdge_g.add_records(xls_file=sdge_gna_file_2023,
+                         parsing_csv_file=sdge_kl_dict_2023)
+
+    acc_calculations(sdge_d, sdge_g, feeder_transfers_ratio=0.09,
+                     utility_marginal_cost_factor=0.0766)

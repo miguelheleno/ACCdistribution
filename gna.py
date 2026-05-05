@@ -86,7 +86,7 @@ class GNA:
             self.gna_data = df
         else:
             x = self.gna_data.set_index('facility_id')
-            df = df.groupby(['facility_id']).sum()
+            df = df.groupby(['facility_id']).sum(numeric_only=True)
             x = x.join(df, rsuffix='dRoP')
             x = x.drop([c for c in x.columns if 'dRoP' in c], axis=1)
             x = x.fillna(0)
@@ -120,11 +120,20 @@ class GNA:
 
          # calculate counterfactual and actual deficiencies
         counterfactual = pd.DataFrame()
+
+        """
+        # method with 2023 ratings
         counterfactual['net'] = net.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
         counterfactual['dec'] = dec.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
         counterfactual['inc'] = inc.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
         actual_def = load_act.sub(rating['2023'], axis=0).clip(lower=0).max(axis=1)
-        #actual_def = (load_act - rating).clip(lower=0).max(axis=1)
+        """
+
+        # method with annual ratings
+        counterfactual['net'] = (net - rating).clip(lower=0).max(axis=1)
+        counterfactual['dec'] = (dec - rating).clip(lower=0).max(axis=1)
+        counterfactual['inc'] = (inc - rating).clip(lower=0).max(axis=1)
+        actual_def = (load_act - rating).clip(lower=0).max(axis=1)
 
         der_red = pd.DataFrame()
         der_red['net'] = (load_dec + load_inc).sum(axis=1)

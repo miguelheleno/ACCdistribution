@@ -191,18 +191,25 @@ class DDOR:
             for i in range(len(slopes)):
                 x_seg = np.linspace(s[i], s[i + 1], n)
                 y_seg = slopes[i] * x_seg + intercepts[i]
-                plt.plot(x_seg, y_seg, color="orange", label='regression')
+                plt.plot(x_seg, y_seg, color="orange",  label='regression' if i == 0 else None)
 
             if fix:
                 # linear segments: blue
                 for i in range(len(slopes)):
                     x_seg = np.linspace(s[i], s[i + 1], n)
                     y_seg = slopes_fixed[i] * x_seg + intercepts_fixed[i]
-                    plt.plot(x_seg, y_seg, color="red", label='fixed regression')
+                    plt.plot(x_seg, y_seg, color="red", label='fixed regression' if i == 0 else None)
 
             # segment boundaries: dotted grey
             for xi in s:
                 plt.axvline(xi, linestyle=":", color="grey", linewidth=1)
+
+            ymin = 0
+            ymax = intercepts[0] * 1.5
+            plt.ylim(bottom=ymin, top=ymax)
+
+            xmax = min(plt.gca().get_xlim()[1], 100)
+            plt.xlim(right=xmax)
 
             plt.axhline(0)
 

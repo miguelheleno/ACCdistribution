@@ -2,6 +2,44 @@ import pandas as pd
 from feeder_transfers import feeder_transfers
 
 
+
+def plot_results(avoided_costs, label, utility):
+
+    import matplotlib.pyplot as plt
+
+    # data
+    x = avoided_costs
+
+    # split
+    x_nonzero = x[x > 0]
+    zero_count = (x == 0).sum()
+    nonzero_count = (x > 0).sum()
+
+    mean_nonzero = x_nonzero.mean()
+
+    # figure with two panes
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+    # left: pie chart (zero vs non-zero)
+    axes[0].pie(
+        [zero_count, nonzero_count],
+        labels=["zero", "non-zero"],
+        autopct="%1.1f%%",
+        colors=["gray", "orange"]
+    )
+    axes[0].set_title(f"Zero vs Non-zero {label} \n avoided costs across banks/feeders")
+
+    # right: histogram (non-zero)
+    axes[1].hist(x_nonzero, bins=50, color="orange")
+    axes[1].axvline(mean_nonzero, color="brown", linestyle="--", label="mean")
+    axes[1].set_xlabel("cost ($/kW)")
+    axes[1].set_ylabel("count")
+    axes[1].set_title("Non-zero cost distribution")
+
+    plt.tight_layout()
+    plt.savefig(f"distribution_{utility}_{label}.png", dpi=200, bbox_inches="tight")
+    plt.close()
+
 def get_unit_cost_of_deficiencies(df, pl_approx):
     """
     :param df: data frame with the deficiencies
@@ -48,9 +86,9 @@ def acc_calculations(ddor, gna, utility_marginal_cost_factor=0.082,
 
     # remove feeder transfers
     df = feeder_transfers(df_original,
-                          method='linear',
+                          method='low_quartile', #'linear' #low_quartile
                           portion=feeder_transfers_ratio,
-                          include_actual=assume_transfers_actual)
+                          include_actual= assume_transfers_actual)
 
     # calculate deferred deficiencies in the counterfactual scenario
     deferred_deficiencies = pd.DataFrame()
@@ -89,15 +127,41 @@ def acc_calculations(ddor, gna, utility_marginal_cost_factor=0.082,
         '2024 Methodology': acc2024_method_avoided_cost,
         'New Aggregated': avoided_costs_yr_aggregated,
         'New Disaggregated (Mean)': avoided_costs_yr_disaggregated.mean(),
+        'New Disaggregated (Max)': avoided_costs_yr_disaggregated.max(),
+        'New Disaggregated (Min)': avoided_costs_yr_disaggregated.min(),
     })
 
-    print(df_comparison)
+    df_comparison.to_csv(f'comparison_aggregate_{gna.utility_name}.csv')
+
+
+    for c in ['dec' ,'inc']:
+        plot_results(avoided_costs=avoided_costs_yr_disaggregated[c],
+                     label= c+'reasing', utility=gna.utility_name)
+
 
     """
-    potential re-aggregation
-    
+    # analysis pge.
+    md = pd.read_csv('approach2_organized.csv', index_col=0)
+    x = avoided_costs_yr_disaggregated.join(md.drop(['dec', 'inc'], axis=1))
+
+    # drop na
+    ratio = x['dual_DER- (act)'] * -1
+    mean_val = ratio.loc[ratio> 0].mean()
+    ratio.loc[ratio == 0] = mean_val
+    ratio = ratio.fillna(1)
+
+    der_efficiency = der.mul(1/ratio, axis=0).sum()
+
+    avoided_costs_aggregated = avoided_cost_yr.mul(
+        ratio, axis=0).sum()/ (-der).sum()
+
+    avoided_costs_disaggregated = avoided_cost_yr.abs().div(
+        der_efficiency.abs()).replace([float('inf'), -float('inf')], 0).fillna(0)
+
+
+
     info = gna_data[['area', 'division', 'facility_type', 'facility_name']]
-    rep = info.join(avoided_cost).join(der, rsuffix="_der")
+    rep = info.join(avoided_cost_yr).join(der, rsuffix="_der")
 
     s = rep.groupby(['division']).sum()
     for c in ['net' ,'dec' ,'inc']:
@@ -106,4 +170,5 @@ def acc_calculations(ddor, gna, utility_marginal_cost_factor=0.082,
     s = s[[c for c in s.columns if 'res_' in c]]
 
     s = info[['facility_name', 'facility_type']].join(df, rsuffix="_def_mw").join(der, rsuffix="_der_mw")
+    
     """
